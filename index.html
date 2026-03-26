@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>HUDSON Protocol — YMCA Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#06090F;--bg2:#0B1120;--bg3:#111B2E;--bg4:#162240;--bg5:#1a2844;
+--bdr:#1E293B;--bdr2:#2D3A52;
+--t1:#F1F5F9;--t2:#94A3B8;--t3:#64748B;--t4:#475569;
+--helm:#7C3AED;--ace:#10B981;--aida:#3B82F6;--fred:#F59E0B;
+--rose:#F43F5E;--cyan:#06B6D4;
+--helm15:rgba(124,58,237,.12);--ace15:rgba(16,185,129,.12);
+--aida15:rgba(59,130,246,.12);--fred15:rgba(245,158,11,.12);
+--rose15:rgba(244,63,94,.12);
+}
+html{background:var(--bg)}
+body{font-family:'Instrument Sans',sans-serif;color:var(--t1);background:var(--bg);line-height:1.55;overflow:hidden;height:100vh}
+h1,h2,h3,h4{font-weight:700;line-height:1.2}
+.mono{font-family:'JetBrains Mono',monospace}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
+
+/* Layout */
+#root{display:flex;height:100vh}
+.sidebar{width:240px;min-width:240px;background:var(--bg2);border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
+.main{flex:1;overflow-y:auto;background:var(--bg)}
+.page{padding:28px 32px 60px;max-width:1400px;margin:0 auto}
+@media(max-width:900px){.sidebar{width:56px;min-width:56px}.sidebar .nav-text,.sidebar .logo-text,.sidebar .sidebar-footer{display:none}.nav-item{justify-content:center;padding:12px}}
+
+/* Sidebar */
+.logo-area{padding:20px 18px;border-bottom:1px solid var(--bdr)}
+.logo-icon{font-size:1.4rem}
+.logo-text{margin-left:8px}
+.logo-text .title{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.85rem;color:var(--aida);letter-spacing:2px}
+.logo-text .sub{font-size:.6rem;color:var(--t4);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px}
+.nav-section{padding:16px 10px;flex:1;overflow-y:auto}
+.nav-group-label{font-size:.6rem;color:var(--t4);letter-spacing:1.5px;text-transform:uppercase;padding:0 8px;margin-bottom:6px;margin-top:14px}
+.nav-group-label:first-child{margin-top:0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;cursor:pointer;font-size:.82rem;font-weight:500;color:var(--t2);transition:all .15s;border:1px solid transparent;margin-bottom:2px}
+.nav-item:hover{background:var(--bg3);color:var(--t1)}
+.nav-item.active{background:var(--bg4);color:var(--t1);border-color:var(--bdr2)}
+.nav-icon{font-size:1rem;width:20px;text-align:center}
+.sidebar-footer{padding:14px 18px;border-top:1px solid var(--bdr);font-size:.6rem;color:var(--t4);text-align:center;letter-spacing:.5px}
+
+/* Cards */
+.card{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--bdr);border-radius:14px;padding:22px;transition:border-color .2s}
+.card:hover{border-color:var(--bdr2)}
+.g{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g5{grid-template-columns:repeat(5,1fr)}
+@media(max-width:1100px){.g4,.g5{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.g2,.g3{grid-template-columns:1fr}}
+
+/* Badges */
+.badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:.65rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+
+/* Metrics */
+.mv{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;line-height:1}
+.ml{font-size:.72rem;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+.md{font-size:.72rem;margin-top:2px}
+
+/* Tables */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--bdr);border-radius:12px;background:var(--bg2)}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th{background:var(--bg3);color:var(--t2);font-weight:600;text-align:left;padding:10px 14px;border-bottom:1px solid var(--bdr);cursor:pointer;white-space:nowrap;font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0;z-index:2}
+th:hover{color:var(--t1)}
+td{padding:9px 14px;border-bottom:1px solid var(--bdr);color:var(--t2)}
+tr:hover td{background:rgba(59,130,246,.04);color:var(--t1)}
+.tbl-scroll{max-height:500px;overflow-y:auto}
+
+/* Inputs */
+.search-box{background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:8px 14px;color:var(--t1);font-family:'Instrument Sans',sans-serif;font-size:.82rem;outline:none;width:100%;transition:border-color .2s}
+.search-box:focus{border-color:var(--aida)}
+.search-box::placeholder{color:var(--t4)}
+select.search-box{cursor:pointer;-webkit-appearance:none}
+.slider{width:100%;-webkit-appearance:none;height:5px;border-radius:3px;background:var(--bdr);outline:none;margin:6px 0}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--aida);cursor:pointer;border:2px solid var(--bg)}
+
+/* Bars */
+.bar-track{height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* Dot */
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+
+/* Alert */
+.alert-card{background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:14px 18px;margin-bottom:8px;border-left:3px solid}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--bdr);margin-bottom:20px}
+.tab{padding:8px 18px;font-size:.78rem;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.tab:hover{color:var(--t1)}
+.tab.active{color:var(--aida);border-bottom-color:var(--aida)}
+
+/* Olivia */
+.olivia-msg{background:var(--bg3);border:1px solid var(--bdr);border-radius:14px 14px 14px 4px;padding:16px 20px;margin-bottom:12px;margin-left:44px;position:relative}
+.olivia-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--helm),var(--aida));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;position:absolute;left:-44px;top:0;color:white}
+
+/* Path cards */
+.path-s{border-left:3px solid var(--ace)}
+.path-f{border-left:3px solid var(--rose)}
+
+/* Prob ring SVG */
+.prob-ring text{font-family:'JetBrains Mono',monospace}
+
+/* Rem grid */
+.rem-g{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:900px){.rem-g{grid-template-columns:repeat(2,1fr)}}
+
+/* CTA */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:10px;font-weight:600;font-size:.82rem;border:none;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:linear-gradient(135deg,var(--aida),var(--helm));color:white}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--bdr)}
+.btn-ghost:hover{border-color:var(--aida);color:var(--t1)}
+
+/* Page header */
+.ph{margin-bottom:28px}
+.ph-badge{margin-bottom:6px}
+.ph h1{font-size:1.6rem;letter-spacing:-.3px}
+.ph p{color:var(--t2);font-size:.9rem;margin-top:4px;max-width:700px}
+
+/* Expand */
+.exp-btn{background:none;border:1px solid var(--bdr);color:var(--t2);padding:6px 14px;border-radius:6px;font-size:.72rem;cursor:pointer;font-family:'Instrument Sans',sans-serif;transition:all .15s}
+.exp-btn:hover{border-color:var(--aida);color:var(--t1)}
+
+/* Stat bar with label */
+.stat-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.stat-bar-label{width:140px;font-size:.78rem;color:var(--t2);flex-shrink:0;text-align:right}
+.stat-bar-track{flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden}
+.stat-bar-fill{height:100%;border-radius:4px}
+.stat-bar-val{width:50px;font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:600}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useMemo,useCallback,useRef}=React;
+
+/* ═══════════════════════════════════════════════════════════════
+   SEEDED PRNG
+   ═══════════════════════════════════════════════════════════════ */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rng=mulberry32(42);
+const R=()=>rng();
+const Ri=(a,b)=>Math.floor(R()*(b-a+1))+a;
+const Rp=(arr)=>arr[Math.floor(R()*arr.length)];
+const Rn=(mu,sig)=>{let u=0,v=0;while(u===0)u=R();while(v===0)v=R();return mu+sig*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+const Rb=(a,b)=>{let x=0,y=0;for(let i=0;i<a;i++)x+=-Math.log(1-R());for(let i=0;i<b;i++)y+=-Math.log(1-R());return x/(x+y);}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONSTANTS
+   ═══════════════════════════════════════════════════════════════ */
+const BRANCHES=['Downtown Cincinnati','Mason Family','Clippard Family','Camp Ernst','Gamble-Nippert','Blue Ash','Anderson','Xenia'];
+const SEGMENTS=['Youth','Young Adult','Adult','Senior'];
+const PROGRAMS=['Youth Swim Lessons','Senior Fitness','After-School Care','Personal Training','Group Exercise','Youth Basketball','Cancer Survivors Wellness','Diabetes Prevention','Family Camp','Childwatch','Teen Leaders','Aquatics Therapy'];
+const FIRST_NAMES=['James','Mary','Robert','Patricia','John','Jennifer','Michael','Linda','David','Elizabeth','William','Barbara','Richard','Susan','Joseph','Jessica','Thomas','Sarah','Charles','Karen','Christopher','Lisa','Daniel','Nancy','Matthew','Betty','Anthony','Margaret','Mark','Sandra','Donald','Ashley','Steven','Kimberly','Andrew','Emily','Paul','Donna','Joshua','Michelle','Kenneth','Carol','Kevin','Amanda','Brian','Dorothy','George','Melissa','Timothy','Deborah','Ronald','Stephanie','Edward','Rebecca','Jason','Sharon','Jeffrey','Laura','Ryan','Cynthia','Marcus','Olivia','Haidar','Aaliyah','DeShawn','Priya','Wei','Carlos','Fatima','Kenji','Sofia','Amir','Nia','Raj','Luna','Andre','Mei','Dante','Zara','Omar','Yuki','Elijah','Amara','Diego','Sita','Jamal','Lila','Mateo','Aya','Kofi','Iris'];
+const LAST_NAMES=['Smith','Johnson','Williams','Brown','Jones','Garcia','Miller','Davis','Rodriguez','Martinez','Hernandez','Lopez','Gonzalez','Wilson','Anderson','Thomas','Taylor','Moore','Jackson','Martin','Lee','Perez','Thompson','White','Harris','Sanchez','Clark','Ramirez','Lewis','Robinson','Walker','Young','Allen','King','Wright','Scott','Torres','Nguyen','Hill','Flores','Green','Adams','Nelson','Baker','Hall','Rivera','Campbell','Mitchell','Carter','Roberts','Patel','Shah','Kim','Chen','Wang','Singh','Cohen','Ali','Hassan','Yamamoto','Tanaka','Mueller','Schneider','Okafor','Mensah','Diaz','Santos','Reyes'];
+const DEPTS=['Member Services','Aquatics','Youth Development','Health & Wellness','Administration','Facilities','Community Outreach','Finance'];
+const ROLES=['Program Director','Instructor','Front Desk','Personal Trainer','Lifeguard','Counselor','Manager','Coordinator','Specialist','Administrator'];
+
+/* ═══════════════════════════════════════════════════════════════
+   DATA GENERATION — 2000 Members, 200 Staff
+   ═══════════════════════════════════════════════════════════════ */
+const genMembers=(n=2000)=>{
+  const arr=[];
+  for(let i=0;i<n;i++){
+    const age=Math.round(Math.min(82,Math.max(6,Rn(38,15))));
+    const seg=age<18?'Youth':age<30?'Young Adult':age<55?'Adult':'Senior';
+    const eng=Rb(4,3)*100;
+    const health=(eng*0.6+Rn(30,8));
+    const tenure=Math.round(Math.min(120,Math.max(1,Rn(24,18))));
+    const visits=Math.min(30,Math.max(0,Math.round(Rn(6,3))));
+    const progs=Math.min(6,Math.max(0,Math.round(Rn(1.5,1))));
+    const churn=Math.min(1,Math.max(0,((100-health)/100)*R()*1.3));
+    const branch=Rp(BRANCHES);
+    const enrolled=[];
+    for(let p=0;p<progs;p++){const pr=Rp(PROGRAMS);if(!enrolled.includes(pr))enrolled.push(pr);}
+    arr.push({
+      id:`MBR-${String(i+1).padStart(5,'0')}`,
+      name:`${Rp(FIRST_NAMES)} ${Rp(LAST_NAMES)}`,
+      age,segment:seg,branch,
+      engagement:Math.round(eng*10)/10,
+      health:Math.round(Math.min(100,Math.max(0,health))*10)/10,
+      tenure,visits,
+      programs:enrolled,
+      churn:Math.round(churn*1000)/1000,
+      nps:Math.round(Rn(55,18)),
+      lastVisit:Ri(0,30),
+      joinDate:`2${Ri(22,25)}-${String(Ri(1,12)).padStart(2,'0')}-${String(Ri(1,28)).padStart(2,'0')}`,
+    });
+  }
+  return arr;
+};
+
+const genStaff=(n=200)=>{
+  const arr=[];
+  for(let i=0;i<n;i++){
+    const tenure=Math.round(Math.min(180,Math.max(1,Rn(30,24))));
+    const satisfaction=Math.round(Rb(6,2)*100*10)/10;
+    const impact=Math.round(Rb(4,3)*100*10)/10;
+    const turnoverRisk=Math.min(1,Math.max(0,(100-satisfaction)/100*R()*1.2));
+    arr.push({
+      id:`STF-${String(i+1).padStart(4,'0')}`,
+      name:`${Rp(FIRST_NAMES)} ${Rp(LAST_NAMES)}`,
+      role:Rp(ROLES),
+      department:Rp(DEPTS),
+      branch:Rp(BRANCHES),
+      tenure,
+      satisfaction,
+      impactScore:impact,
+      turnoverRisk:Math.round(turnoverRisk*1000)/1000,
+      membersServed:Ri(15,200),
+      certifications:Ri(0,5),
+      salary:Ri(28000,72000),
+    });
+  }
+  return arr;
+};
+
+const MEMBERS=genMembers(2000);
+const STAFF=genStaff(200);
+
+/* ═══════════════════════════════════════════════════════════════
+   FUZZY FUNCTIONS — 50 total, top 10 goal-relevant
+   ═══════════════════════════════════════════════════════════════ */
+const FUZZY_ALL=[
+  {id:1,name:'Early-Stage Retention (0-90d)',cat:'Retention',mu:.42,rank:1},
+  {id:2,name:'Brand Awareness in Service Area',cat:'Marketing',mu:.55,rank:2},
+  {id:3,name:'Community Engagement Depth',cat:'Community',mu:.61,rank:3},
+  {id:4,name:'Referral Generation Rate',cat:'Marketing',mu:.38,rank:4},
+  {id:5,name:'Trial-to-Member Conversion',cat:'Marketing',mu:.47,rank:5},
+  {id:6,name:'Digital Marketing Effectiveness',cat:'Marketing',mu:.33,rank:6},
+  {id:7,name:'Newcomer Integration Speed',cat:'Community',mu:.29,rank:7},
+  {id:8,name:'Competitive Differentiation',cat:'Marketing',mu:.44,rank:8},
+  {id:9,name:'Program Capacity Optimization',cat:'Operations',mu:.72,rank:9},
+  {id:10,name:'Member Social Connectivity',cat:'Community',mu:.51,rank:10},
+  {id:11,name:'Group Program Participation',cat:'Community',mu:.58},{id:12,name:'Volunteer Activation Rate',cat:'Community',mu:.44},
+  {id:13,name:'Community Event Frequency',cat:'Community',mu:.52},{id:14,name:'Member Interaction Density',cat:'Community',mu:.39},
+  {id:15,name:'Family Engagement Breadth',cat:'Community',mu:.63},{id:16,name:'Youth Program Penetration',cat:'Community',mu:.71},
+  {id:17,name:'Senior Community Vitality',cat:'Community',mu:.66},{id:18,name:'Long-Term Member Loyalty',cat:'Retention',mu:.78},
+  {id:19,name:'NPS Momentum',cat:'Retention',mu:.55},{id:20,name:'Complaint Resolution Speed',cat:'Retention',mu:.62},
+  {id:21,name:'Facility Satisfaction Index',cat:'Retention',mu:.74},{id:22,name:'Program Satisfaction Depth',cat:'Retention',mu:.69},
+  {id:23,name:'Staff-Member Relationship Quality',cat:'Retention',mu:.35},{id:24,name:'Renewal Predictability',cat:'Retention',mu:.58},
+  {id:25,name:'Churn Warning Sensitivity',cat:'Retention',mu:.41},{id:26,name:'Win-Back Effectiveness',cat:'Retention',mu:.33},
+  {id:27,name:'Geographic Market Penetration',cat:'Marketing',mu:.52},{id:28,name:'Demographic Reach Diversity',cat:'Marketing',mu:.61},
+  {id:29,name:'Social Media Engagement',cat:'Marketing',mu:.28},{id:30,name:'Local Media Presence',cat:'Marketing',mu:.36},
+  {id:31,name:'Facility Utilization Efficiency',cat:'Operations',mu:.72},{id:32,name:'Revenue Diversification Index',cat:'Operations',mu:.48},
+  {id:33,name:'Grant Pipeline Health',cat:'Operations',mu:.31},{id:34,name:'Operational Cost Efficiency',cat:'Operations',mu:.65},
+  {id:35,name:'Technology Infrastructure',cat:'Operations',mu:.27},{id:36,name:'Data-Driven Decision Readiness',cat:'Operations',mu:.22},
+  {id:37,name:'Financial Reserve Adequacy',cat:'Operations',mu:.59},{id:38,name:'Pricing Competitiveness',cat:'Operations',mu:.54},
+  {id:39,name:'Cross-Branch Resource Sharing',cat:'Operations',mu:.41},{id:40,name:'Staff Retention & Development',cat:'People',mu:.38},
+  {id:41,name:'Leadership Vision Alignment',cat:'People',mu:.67},{id:42,name:'Mission-Driven Culture Strength',cat:'People',mu:.73},
+  {id:43,name:'Staff Digital Literacy',cat:'People',mu:.31},{id:44,name:'Organizational Adaptability',cat:'People',mu:.45},
+  {id:45,name:'Cross-Functional Collaboration',cat:'People',mu:.52},{id:46,name:'Board Engagement & Advocacy',cat:'People',mu:.64},
+  {id:47,name:'Institutional Knowledge Preservation',cat:'People',mu:.56},{id:48,name:'Innovation Capacity',cat:'People',mu:.34},
+  {id:49,name:'Equity & Inclusion Embeddedness',cat:'People',mu:.68},{id:50,name:'Community Partnership Density',cat:'Community',mu:.57},
+];
+const TOP10=FUZZY_ALL.filter(f=>f.rank).sort((a,b)=>a.rank-b.rank);
+const WEAK=TOP10.filter(f=>f.mu<0.45);
+
+/* Upcoming events with multiple success/failure paths */
+const EVENTS=[
+  {name:'Summer Membership Surge',period:'May–Aug 2026',
+    sp:[{l:'Launch ACE summer micro-communities',p:.78,d:'Form outdoor activity groups 60 days before summer. Pre-built belonging captures surge members before they default to solo usage.'},{l:'Deploy Olivia onboarding within 48h',p:.72,d:'Every new summer member receives personalized welcome with group match. Compress relationship formation from months to days.'},{l:'Partner with 3 community orgs',p:.65,d:'Open Y events in parks. ACE groups host public sessions. Zero-cost acquisition.'}],
+    fp:[{l:'Treat surge as gym traffic',p:.55,d:'Default amenity marketing. Members join, use pool 6 weeks, form zero connections, cancel September.'},{l:'Staff overwhelmed — skip personalization',p:.48,d:'1,000:1 ratio makes outreach impossible without HELM. Generic welcome emails. 40% churn by month 3.'}]},
+  {name:'New Year Resolution Wave',period:'Jan–Feb 2027',
+    sp:[{l:'AIDA goal plans activated day 1',p:.81,d:'Every resolution member gets governing-rule extraction and gap analysis in first week.'},{l:'ACE accountability groups immediately',p:.74,d:'95% more likely to reach goals with a partner. ACE creates partners algorithmically on day one.'},{l:'FRED 30/60/90 day tracking live',p:.70,d:'Churn scoring triggers Olivia interventions before mental checkout. 73% return rate within 48h.'}],
+    fp:[{l:'Sell without transformation infrastructure',p:.62,d:'Industry standard: 96% of fitness app users churn in 90 days. Same trajectory.'},{l:'Rely on willpower narrative',p:.58,d:'"Just keep coming!" is not retention strategy. Without governing-rule alignment, burnout is guaranteed.'}]},
+  {name:'Back-to-School Transition',period:'Aug–Sep 2026',
+    sp:[{l:'ACE adapts group schedules proactively',p:.69,d:'FRED predicts shifts 30 days ahead. ACE reorganizes before disengagement.'},{l:'Youth program family cross-sell',p:.73,d:'Parents enrolling kids receive Olivia recommendation for own programming.'}],
+    fp:[{l:'Lose adults while gaining youth',p:.52,d:'Schedule changes drop adult visits 30% in September.'},{l:'Program capacity mismatch',p:.44,d:'Youth overflow, adult underutilize. Resources misallocated 6-8 weeks.'}]},
+  {name:'Holiday Season Drop-off',period:'Nov–Dec 2026',
+    sp:[{l:'Olivia holiday engagement campaign',p:.71,d:'Personalized check-ins, goal recalibration, community invitations. Targeted, timed, individual.'},{l:'ACE seasonal community events',p:.66,d:'Holiday charity drives and family events maintain bonds even when gym visits decline.'}],
+    fp:[{l:'Go silent and hope for January',p:.60,d:'Two months zero contact. January becomes re-acquisition at 10× cost.'},{l:'Generic "We miss you" emails',p:.53,d:'Broadcast confirms members are numbers, not people.'}]},
+  {name:'Local Competitor Expansion',period:'Q3 2026',
+    sp:[{l:'Double down on belonging',p:.76,d:'No gym chain has algorithmic micro-communities, Olivia, or governing-rule roadmaps. Mission IS the moat.'},{l:'FRED competitive intelligence',p:.68,d:'Real-time sentiment and churn tracking in affected branch.'}],
+    fp:[{l:'Compete on amenities and price',p:.58,d:'National chains have deeper capital. Amenity competition is losing strategy for nonprofit.'},{l:'Ignore and lose 200+ members',p:.45,d:'At $720/member/year, 200 lost = $144K annual revenue loss.'}]},
+  {name:'Annual Fundraising Campaign',period:'Oct 2026',
+    sp:[{l:'FRED evidence-backed grants',p:.82,d:'First-ever causal attribution data in applications. Evidence wins funding.'},{l:'Olivia-timed donor asks',p:.71,d:'Peak mission-connection moments: post-goal, post-milestone. 3-5× conversion.'},{l:'Well-being Collaborative positioning',p:.64,d:'Present FRED to 75-YMCA network. HHS/HRSA/NSF eligibility unlocked.'}],
+    fp:[{l:'Narrative-only applications',p:.56,d:'85% rejection rate for narrative federal proposals.'},{l:'Blast donation emails',p:.49,d:'Untargeted asks generate donor fatigue.'}]},
+  {name:'Staff Turnover Cycle',period:'Spring 2027',
+    sp:[{l:'AIDA staff development framework',p:.73,d:'Staff receive same identity-level modeling. Don\'t leave for $0.50/hr.'},{l:'FRED Mission Impact Scorecards',p:.77,d:'Staff see exactly which outcomes their work produced.'}],
+    fp:[{l:'Lose 15+ staff in 90 days',p:.52,d:'$67K–$120K direct cost plus institutional knowledge loss.'},{l:'Undertrained replacements',p:.41,d:'New staff break member relationships. Staff churn feeds member churn.'}]},
+  {name:'Community Health Fair',period:'Sep 2026',
+    sp:[{l:'ACE micro-community demo booths',p:.74,d:'Live matching for attendees. The product is community, not facility.'},{l:'AIDA live goal-setting station',p:.70,d:'5-minute governing-rule extraction. Attendees see probability score. Hooked by self-knowledge.'}],
+    fp:[{l:'Brochures and free pens',p:.55,d:'5,000 walk by. 200 take brochure. 5 sign up. Astronomical cost per acquisition.'},{l:'Collect emails for unread newsletter',p:.48,d:'3% open rate. Zero personalization.'}]},
+];
+
+/* Probability computation */
+function computeProb(){
+  let sw=0,fw=0;
+  EVENTS.forEach(e=>{e.sp.forEach(p=>sw+=p.p);e.fp.forEach(p=>fw+=p.p)});
+  const raw=sw/(sw+fw);
+  const avgMu=TOP10.reduce((s,f)=>s+f.mu,0)/TOP10.length;
+  return Math.round(raw*avgMu*100*1.55);
+}
+const PROBABILITY=computeProb();
+
+/* Remediation plans for weak functions */
+const REM_PLANS={
+  'Early-Stage Retention (0-90d)':{
+    daily:['Review FRED churn dashboard every morning','Olivia sends 10 personalized check-ins to at-risk new members','Log every new-member interaction in HELM'],
+    weekly:['Review 0-30 day cohort health scores','ACE rebalances group matches for new members','Huddle: which new members haven\'t visited 7+ days?'],
+    monthly:['Full cohort retention analysis: 30/60/90 day rates','FRED intervention effectiveness report','Adjust HELM outreach timing based on data'],
+    annual:['Set branch-level 90-day retention targets','Evaluate ACE matching algorithm performance','Board report: retention revenue impact by FRED']},
+  'Referral Generation Rate':{
+    daily:['Staff asks 3 satisfied members for referral','Track referral source for every walk-in','Olivia mentions referral program post-milestone'],
+    weekly:['Analyze referral conversion rates by branch','Identify top 20 most-connected members','Test one new referral incentive variant'],
+    monthly:['Calculate cost-per-acquisition: referral vs paid','Survey recent referrers','Expand referral program based on data'],
+    annual:['Annual referral program redesign','Ambassador program expansion','Calculate revenue attributable to referrals']},
+  'Digital Marketing Effectiveness':{
+    daily:['Post one community story to social','Respond to all social mentions within 2h','Review digital ad performance metrics'],
+    weekly:['Review ad spend vs conversion by channel','A/B test one new creative or audience','Analyze which content types drive trials'],
+    monthly:['Monthly digital channel ROI review','Reallocate from underperforming channels','Launch new campaign for audience gaps'],
+    annual:['Annual digital strategy overhaul','Technology stack evaluation','Benchmark against peer YMCA digital performance']},
+  'Newcomer Integration Speed':{
+    daily:['Olivia sends same-day welcome to every join','ACE generates group match within 24h','Front desk introduces new members to a regular'],
+    weekly:['Audit: % of new members group-matched in first week','Review Olivia onboarding completion rates','Identify integration bottlenecks by branch'],
+    monthly:['Measure avg days from join to first group activity','Compare branch integration performance','Set improvement targets for next month'],
+    annual:['Redesign onboarding journey from 12 months of data','Set standard: group match within 48 hours','Publish methodology for Well-being Collaborative']},
+  'Competitive Differentiation':{
+    daily:['Staff articulates one mission-vs-gym difference to a member','Document one ACE belonging story','Share one AIDA transformation outcome internally'],
+    weekly:['Review competitive intelligence from FRED','Identify which differentiators resonate most','Train staff on mission-first positioning'],
+    monthly:['Community perception survey analysis','Adjust positioning based on competitive moves','ACE generates new visible community activities'],
+    annual:['Full competitive strategy review','Brand positioning refresh','Well-being Collaborative differentiation study']},
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   MICRO COMMUNITIES
+   ═══════════════════════════════════════════════════════════════ */
+const MICRO_COMMUNITIES=[
+  {name:'River Trail Cyclists',n:12,ret:94.2,visits:8.4,branch:'Downtown Cincinnati'},
+  {name:'6AM Swim Masters',n:8,ret:96.1,visits:9.2,branch:'Mason Family'},
+  {name:'Young Parent Playgroup',n:15,ret:89.7,visits:6.8,branch:'Blue Ash'},
+  {name:'Senior Strength Circle',n:10,ret:92.8,visits:7.1,branch:'Gamble-Nippert'},
+  {name:'Teen Leadership Cohort',n:9,ret:88.4,visits:5.9,branch:'Anderson'},
+  {name:'Cancer Recovery Warriors',n:6,ret:97.3,visits:7.8,branch:'Downtown Cincinnati'},
+  {name:'Weekend Basketball League',n:14,ret:91.0,visits:6.3,branch:'Camp Ernst'},
+  {name:'Mindfulness & Yoga Collective',n:11,ret:93.5,visits:7.0,branch:'Clippard Family'},
+  {name:'New Member Welcome Circle',n:20,ret:85.2,visits:5.1,branch:'Multiple'},
+  {name:'Family Adventure Club',n:18,ret:90.8,visits:6.5,branch:'Camp Ernst'},
+  {name:'Diabetes Management Group',n:7,ret:95.6,visits:8.0,branch:'Mason Family'},
+  {name:'After-Work Destress Squad',n:13,ret:88.9,visits:5.7,branch:'Downtown Cincinnati'},
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   SHARED UI COMPONENTS
+   ═══════════════════════════════════════════════════════════════ */
+const Badge=({text,color,bg})=><span className="badge" style={{background:bg||color+'20',color}}>{text}</span>;
+const Dot=({color})=><span className="dot" style={{background:color}}/>;
+const Bar=({val,max=100,color='var(--aida)'})=>{
+  const c=color==='auto'?(val/max<.4?'var(--rose)':val/max<.65?'var(--fred)':'var(--ace)'):color;
+  return <div className="bar-track"><div className="bar-fill" style={{width:`${val/max*100}%`,background:c}}/></div>;
+};
+const MetricCard=({label,value,sub,color='var(--t1)'})=>(
+  <div className="card" style={{textAlign:'center'}}>
+    <div className="mv" style={{color}}>{value}</div>
+    <div className="ml">{label}</div>
+    {sub&&<div className="md" style={{color:'var(--ace)'}}>{sub}</div>}
+  </div>
+);
+const PageHeader=({badge,badgeColor,title,sub})=>(
+  <div className="ph">
+    {badge&&<div className="ph-badge"><Badge text={badge} color={badgeColor}/></div>}
+    <h1>{title}</h1>
+    {sub&&<p>{sub}</p>}
+  </div>
+);
+const Tabs=({tabs,active,onChange})=>(
+  <div className="tabs">{tabs.map((t,i)=><div key={i} className={`tab${active===i?' active':''}`} onClick={()=>onChange(i)}>{t}</div>)}</div>
+);
+
+/* ═══════════════════════════════════════════════════════════════
+   SORTABLE TABLE
+   ═══════════════════════════════════════════════════════════════ */
+function DataTable({columns,data,maxH=500}){
+  const [sortCol,setSortCol]=useState(null);
+  const [sortDir,setSortDir]=useState('desc');
+  const sorted=useMemo(()=>{
+    if(!sortCol)return data;
+    return[...data].sort((a,b)=>{
+      let va=a[sortCol],vb=b[sortCol];
+      if(typeof va==='string')return sortDir==='asc'?va.localeCompare(vb):vb.localeCompare(va);
+      return sortDir==='asc'?va-vb:vb-va;
+    });
+  },[data,sortCol,sortDir]);
+  const handleSort=(col)=>{
+    if(sortCol===col)setSortDir(d=>d==='asc'?'desc':'asc');
+    else{setSortCol(col);setSortDir('desc');}
+  };
+  return(
+    <div className="tbl-wrap">
+      <div className="tbl-scroll" style={{maxHeight:maxH}}>
+        <table>
+          <thead><tr>{columns.map(c=>(
+            <th key={c.key} onClick={()=>handleSort(c.key)} style={{cursor:'pointer'}}>
+              {c.label} {sortCol===c.key?(sortDir==='asc'?'↑':'↓'):''}
+            </th>
+          ))}</tr></thead>
+          <tbody>{sorted.map((row,i)=>(
+            <tr key={i}>{columns.map(c=>(
+              <td key={c.key} style={c.style?c.style(row[c.key],row):{}}>{c.render?c.render(row[c.key],row):row[c.key]}</td>
+            ))}</tr>
+          ))}</tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE: DASHBOARD
+   ═══════════════════════════════════════════════════════════════ */
+function DashboardPage(){
+  const avgHealth=Math.round(MEMBERS.reduce((s,m)=>s+m.health,0)/MEMBERS.length*10)/10;
+  const avgEng=Math.round(MEMBERS.reduce((s,m)=>s+m.engagement,0)/MEMBERS.length*10)/10;
+  const highRisk=MEMBERS.filter(m=>m.churn>.7).length;
+  const avgRet=Math.round(MEMBERS.filter(m=>m.tenure>3).length/MEMBERS.length*1000)/10;
+  const avgStaffSat=Math.round(STAFF.reduce((s,m)=>s+m.satisfaction,0)/STAFF.length*10)/10;
+  const staffAtRisk=STAFF.filter(s=>s.turnoverRisk>.6).length;
+
+  return(
+    <div className="page">
+      <PageHeader badge="EXECUTIVE OVERVIEW" badgeColor="var(--aida)" title="HUDSON Protocol — Command Center" sub={`Monitoring ${MEMBERS.length.toLocaleString()} members and ${STAFF.length} staff across ${BRANCHES.length} branches`}/>
+      <div className="g g5" style={{marginBottom:24}}>
+        <MetricCard label="Total Members" value={MEMBERS.length.toLocaleString()} color="var(--aida)"/>
+        <MetricCard label="Avg Health Score" value={avgHealth} sub={`Engagement: ${avgEng}`} color="var(--ace)"/>
+        <MetricCard label="Retention Est." value={`${avgRet}%`} color="var(--ace)"/>
+        <MetricCard label="High-Risk Members" value={highRisk} sub={`>${(highRisk/MEMBERS.length*100).toFixed(1)}% of base`} color="var(--rose)"/>
+        <MetricCard label="Staff Satisfaction" value={avgStaffSat} sub={`${staffAtRisk} at-risk`} color="var(--fred)"/>
+      </div>
+
+      {/* Engine status */}
+      <h3 style={{marginBottom:12,color:'var(--t2)',fontSize:'.82rem',textTransform:'uppercase',letterSpacing:'1px'}}>Engine Status</h3>
+      <div className="g g4" style={{marginBottom:24}}>
+        {[{n:'HELM',c:'var(--helm)',i:'🧭',s:`${MEMBERS.length.toLocaleString()} conversations orchestrated`},
+          {n:'ACE',c:'var(--ace)',i:'⚡',s:`${MICRO_COMMUNITIES.length} micro-communities active`},
+          {n:'AIDA',c:'var(--aida)',i:'🔬',s:`50 fuzzy functions · Prob: ${PROBABILITY}%`},
+          {n:'FRED',c:'var(--fred)',i:'📡',s:`${ALERTS.length} active alerts`}
+        ].map((e,i)=>(
+          <div key={i} className="card" style={{borderLeft:`3px solid ${e.c}`}}>
+            <Badge text={`${e.i} ${e.n}`} color={e.c}/>
+            <div style={{fontSize:'.82rem',color:'var(--t2)',marginTop:8}}>{e.s}</div>
+            <div style={{marginTop:8,display:'flex',alignItems:'center',gap:6}}>
+              <Dot color={e.c}/><span style={{color:e.c,fontSize:'.65rem',fontWeight:700,letterSpacing:'.5px',textTransform:'uppercase'}}>OPERATIONAL</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Branch breakdown */}
+      <h3 style={{marginBottom:12,color:'var(--t2)',fontSize:'.82rem',textTransform:'uppercase',letterSpacing:'1px'}}>Branch Breakdown</h3>
+      <div className="g g4" style={{marginBottom:24}}>
+        {BRANCHES.map(b=>{
+          const bm=MEMBERS.filter(m=>m.branch===b);
+          const bs=STAFF.filter(s=>s.branch===b);
+          const hr=bm.filter(m=>m.churn>.7).length;
+          return(
+            <div key={b} className="card" style={{padding:'16px'}}>
+              <div style={{fontWeight:600,fontSize:'.85rem',marginBottom:6}}>{b}</div>
+              <div style={{display:'flex',gap:16}}>
+                <div><span className="mono" style={{color:'var(--aida)',fontWeight:600}}>{bm.length}</span><span style={{color:'var(--t3)',fontSize:'.72rem',marginLeft:4}}>members</span></div>
+                <div><span className="mono" style={{color:'var(--fred)',fontWeight:600}}>{bs.length}</span><span style={{color:'var(--t3)',fontSize:'.72rem',marginLeft:4}}>staff</span></div>
+              </div>
+              {hr>0&&<div style={{fontSize:'.72rem',color:'var(--rose)',marginTop:4}}>⚠ {hr} high-risk</div>}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Alerts */}
+      <h3 style={{marginBottom:12,color:'var(--t2)',fontSize:'.82rem',textTransform:'uppercase',letterSpacing:'1px'}}>FRED Alert Queue</h3>
+      {ALERTS.map((a,i)=>(
+        <div key={i} className="alert-card" style={{borderLeftColor:a.color}}>
+          <div><span style={{color:a.color,fontWeight:700,fontSize:'.75rem'}}>{a.icon} {a.sev}</span><span style={{color:'var(--t3)',marginLeft:10,fontSize:'.75rem'}}>{a.branch}</span></div>
+          <div style={{color:'var(--t1)',fontSize:'.85rem',margin:'6px 0 4px'}}>{a.desc}</div>
+          <div style={{color:'var(--t3)',fontSize:'.72rem',fontStyle:'italic'}}>↳ {a.resp}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE: HELM
+   ═══════════════════════════════════════════════════════════════ */
+const OLIVIA_MSGS=[
+  {text:"Hey Sarah! I noticed you haven't visited in 12 days — that's unusual for you. Your cycling group meets Thursday at 6pm and Maria asked about you.",eng:'ACE',seg:'Adult',br:'Downtown'},
+  {text:"James, congratulations on hitting your 90-day milestone! Your health score jumped 14 points since joining. Ready to set your next goal?",eng:'AIDA',seg:'Senior',br:'Mason Family'},
+  {text:"Based on your recent sessions, you might love our new Aquatics Therapy program on Tuesday mornings. Three members from your fitness group already signed up.",eng:'ACE',seg:'Adult',br:'Blue Ash'},
+  {text:"Hi David — you mentioned wanting to run a 5K by summer. You're averaging 3 visits/week now, up from 1. That's real progress. Want to look at the Couch-to-5K group?",eng:'AIDA',seg:'Young Adult',br:'Anderson'},
+  {text:"Welcome to the Y, Marcus! I'm Olivia. Based on your intake, I matched you with our Tuesday evening basketball group — competitive but welcoming, exactly what you wanted.",eng:'HELM',seg:'Youth',br:'Gamble-Nippert'},
+  {text:"Good morning, Lisa! Your Senior Strength Circle meets today at 10am. Ruth mentioned she has a recipe to share with you. See you there!",eng:'ACE',seg:'Senior',br:'Clippard Family'},
+  {text:"Hi Priya — AIDA flagged that your probability score ticked up 8 points this month. Your new governing rule 'I prioritize my health first' is really working. Keep going.",eng:'AIDA',seg:'Adult',br:'Downtown'},
+  {text:"Hey Andre — just checking in. Looks like you missed two sessions this week. No judgment, life happens. Want me to find a different time slot that works better?",eng:'FRED',seg:'Young Adult',br:'Blue Ash'},
+];
+
+function HelmPage(){
+  const [search,setSearch]=useState('');
+  const [branchF,setBranchF]=useState('');
+  const [tab,setTab]=useState(0);
+  const filtered=useMemo(()=>{
+    let d=MEMBERS;
+    if(search)d=d.filter(m=>m.name.toLowerCase().includes(search.toLowerCase())||m.id.includes(search));
+    if(branchF)d=d.filter(m=>m.branch===branchF);
+    return d;
+  },[search,branchF]);
+
+  return(
+    <div className="page">
+      <PageHeader badge="🧭 HELM ENGINE" badgeColor="var(--helm)" title="Human Engineering Logic Master" sub="Master orchestrator. Olivia persona. Single point of contact for all members and systems."/>
+      <Tabs tabs={['Olivia Conversations','Member Registry','Member Analytics']} active={tab} onChange={setTab}/>
+
+      {tab===0&&(
+        <div style={{maxWidth:700}}>
+          <p style={{color:'var(--t2)',marginBottom:20,fontSize:'.88rem'}}>Olivia is HELM's white-labeled persona — the face of HUDSON. Every interaction below was generated by a specific engine and delivered through Olivia as one trusted voice.</p>
+          {OLIVIA_MSGS.map((m,i)=>(
+            <div key={i} className="olivia-msg">
+              <div className="olivia-av">O</div>
+              <div style={{display:'flex',gap:8,marginBottom:6,alignItems:'center',flexWrap:'wrap'}}>
+                <Badge text={m.eng} color={m.eng==='ACE'?'var(--ace)':m.eng==='AIDA'?'var(--aida)':m.eng==='FRED'?'var(--fred)':'var(--helm)'}/>
+                <span style={{fontSize:'.68rem',color:'var(--t3)'}}>{m.br} · {m.seg}</span>
+              </div>
+              <p style={{color:'var(--t1)',fontSize:'.88rem',lineHeight:1.6}}>"{m.text}"</p>
+            </div>
+          ))}
+          <div className="card" style={{textAlign:'center',marginTop:20}}>
+            <div className="mv" style={{color:'var(--helm)'}}>73%</div>
+            <div className="ml">return rate when Olivia contacts within 48h of missed visit</div>
+          </div>
+        </div>
+      )}
+
+      {tab===1&&(
+        <div>
+          <div style={{display:'flex',gap:12,marginBottom:16,flexWrap:'wrap'}}>
+            <input className="search-box" placeholder="Search by name or ID..." value={search} onChange={e=>setSearch(e.target.value)} style={{maxWidth:300}}/>
+            <select className="search-box" value={branchF} onChange={e=>setBranchF(e.target.value)} style={{maxWidth:220}}>
+              <option value="">All Branches</option>
+              {BRANCHES.map(b=><option key={b} value={b}>{b}</option>)}
+            </select>
+            <span style={{color:'var(--t3)',fontSize:'.78rem',alignSelf:'center'}}>{filtered.length.toLocaleString()} records</span>
+          </div>
+          <DataTable maxH={560} columns={[
+            {key:'id',label:'ID'},
+            {key:'name',label:'Name',style:()=>({color:'var(--t1)',fontWeight:500})},
+            {key:'age',label:'Age'},
+            {key:'segment',label:'Segment',render:v=><Badge text={v} color={v==='Youth'?'var(--aida)':v==='Senior'?'var(--fred)':v==='Adult'?'var(--ace)':'var(--helm)'}/>},
+            {key:'branch',label:'Branch'},
+            {key:'health',label:'Health',render:v=><span className="mono" style={{color:v<40?'var(--rose)':v<65?'var(--fred)':'var(--ace)'}}>{v}</span>},
+            {key:'engagement',label:'Engagement',render:v=><span className="mono">{v}</span>},
+            {key:'churn',label:'Churn Risk',render:v=><span className="mono" style={{color:v>.7?'var(--rose)':v>.4?'var(--fred)':'var(--ace)'}}>{(v*100).toFixed(1)}%</span>},
+            {key:'visits',label:'Visits/Mo'},
+            {key:'tenure',label:'Tenure (mo)'},
+            {key:'lastVisit',label:'Last Visit',render:v=>v===0?<span style={{color:'var(--ace)'}}>Today</span>:v<3?`${v}d ago`:<span style={{color:v>14?'var(--rose)':'var(--t2)'}}>{v}d ago</span>},
+          ]} data={filtered}/>
+        </div>
+      )}
+
+      {tab===2&&(
+        <div>
+          <div className="g g4" style={{marginBottom:24}}>
+            {SEGMENTS.map(seg=>{
+              const sm=MEMBERS.filter(m=>m.segment===seg);
+              return <MetricCard key={seg} label={seg} value={sm.length} sub={`Avg health: ${(sm.reduce((s,m)=>s+m.health,0)/sm.length).toFixed(1)}`} color={seg==='Youth'?'var(--aida)':seg==='Senior'?'var(--fred)':seg==='Adult'?'var(--ace)':'var(--helm)'}/>;
+            })}
+          </div>
+          <h3 style={{color:'var(--t2)',marginBottom:12}}>Health Score Distribution</h3>
+          <div style={{display:'flex',gap:2,height:160,alignItems:'flex-end',marginBottom:24}}>
+            {Array.from({length:20},(_,i)=>{
+              const lo=i*5,hi=(i+1)*5;
+              const count=MEMBERS.filter(m=>m.health>=lo&&m.health<hi).length;
+              const maxC=MEMBERS.length/10;
+              return <div key={i} style={{flex:1,background:lo<40?'var(--rose)':lo<65?'var(--fred)':'var(--ace)',height:`${count/maxC*100}%`,borderRadius:'3px 3px 0 0',opacity:.8,position:'relative'}} title={`${lo}-${hi}: ${count} members`}/>;
+            })}
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',fontSize:'.65rem',color:'var(--t4)'}}>
+            <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE: ACE
+   ═══════════════════════════════════════════════════════════════ */
+function AcePage(){
+  const [tab,setTab]=useState(0);
+  return(
+    <div className="page">
+      <PageHeader badge="⚡ ACE ENGINE" badgeColor="var(--ace)" title="AI Community Engine" sub="Belonging architecture. Psychographic profiling. Fuzzy affinity clustering. Micro-community formation."/>
+      <Tabs tabs={['Micro-Communities','Program Analytics','ARB Alignment']} active={tab} onChange={setTab}/>
+
+      {tab===0&&(
+        <div>
+          <div className="g g3" style={{marginBottom:24}}>
+            <MetricCard label="Active Communities" value={MICRO_COMMUNITIES.length} color="var(--ace)"/>
+            <MetricCard label="Grouped Retention" value="91.3%" sub="vs 78.2% unaffiliated" color="var(--ace)"/>
+            <MetricCard label="Retention Lift" value="2.4×" sub="more likely to stay 12+ months" color="var(--ace)"/>
+          </div>
+          <div className="g g3">
+            {MICRO_COMMUNITIES.map((c,i)=>(
+              <div key={i} className="card" style={{borderLeft:'3px solid var(--ace)'}}>
+                <div style={{fontWeight:600,fontSize:'.9rem'}}>{c.name}</div>
+                <div style={{display:'flex',gap:16,marginTop:8}}>
+                  <div><span className="mono" style={{color:'var(--ace)',fontWeight:600}}>{c.n}</span><span style={{color:'var(--t3)',fontSize:'.72rem',marginLeft:4}}>members</span></div>
+                  <div><span className="mono" style={{color:'var(--ace)',fontWeight:600}}>{c.ret}%</span><span style={{color:'var(--t3)',fontSize:'.72rem',marginLeft:4}}>retention</span></div>
+                  <div><span className="mono" style={{fontWeight:600}}>{c.visits}</span><span style={{color:'var(--t3)',fontSize:'.72rem',marginLeft:4}}>visits/mo</span></div>
+                </div>
+                <div style={{fontSize:'.72rem',color:'var(--t3)',marginTop:6}}>{c.branch}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {tab===1&&(
+        <div>
+          {PROGRAMS.map((p,i)=>{
+            const enrolled=MEMBERS.filter(m=>m.programs.includes(p)).length;
+            const cap=Math.round(enrolled*1.2+Ri(5,30));
+            const util=Math.round(enrolled/cap*100);
+            return(
+              <div key={i} className="stat-bar">
+                <div className="stat-bar-label" style={{width:200}}>{p}</div>
+                <div className="stat-bar-track" style={{flex:1}}>
+                  <div className="stat-bar-fill" style={{width:`${util}%`,background:util>90?'var(--ace)':util>60?'var(--aida)':'var(--fred)'}}/>
+                </div>
+                <div className="stat-bar-val" style={{color:util>90?'var(--ace)':util>60?'var(--aida)':'var(--fred)'}}>{util}%</div>
+                <div style={{width:80,fontSize:'.72rem',color:'var(--t3)'}}>{enrolled}/{cap}</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {tab===2&&(
+        <div className="g g2" style={{gap:32}}>
+          <div className="card" style={{borderLeft:'3px solid var(--ace)'}}>
+            <h4 style={{color:'var(--ace)',fontSize:'.78rem',textTransform:'uppercase',letterSpacing:'1px',marginBottom:14}}>YMCA Theory of Change</h4>
+            {['A = Achievement — setting and pursuing goals','R = Relationships — joining groups that inspire','B = Belonging — serving with others toward shared outcome'].map((t,i)=>
+              <p key={i} style={{color:'var(--t2)',fontSize:'.88rem',marginBottom:10,paddingLeft:14,borderLeft:'2px solid var(--ace)'}}>{t}</p>)}
+            <p className="mono" style={{color:'var(--ace)',fontWeight:700,marginTop:14,fontSize:'.9rem'}}>A + R + B = T (Transformed Life)</p>
+          </div>
+          <div className="card" style={{borderLeft:'3px solid var(--aida)'}}>
+            <h4 style={{color:'var(--aida)',fontSize:'.78rem',textTransform:'uppercase',letterSpacing:'1px',marginBottom:14}}>HUDSON's AIDA Framework</h4>
+            {['A = Antecedent — current state, identity, context','R = Rule Base — fuzzy logic inference rules','B = Consequent — predicted outcome, path'].map((t,i)=>
+              <p key={i} style={{color:'var(--t2)',fontSize:'.88rem',marginBottom:10,paddingLeft:14,borderLeft:'2px solid var(--aida)'}}>{t}</p>)}
+            <p className="mono" style={{color:'var(--aida)',fontWeight:700,marginTop:14,fontSize:'.9rem'}}>Same letters. Same sequence. Built for each other.</p>
+          </div>
+          <div className="card" style={{gridColumn:'1/-1',textAlign:'center',padding:28}}>
+            <p style={{fontSize:'1rem',color:'var(--t1)',lineHeight:1.7}}>75 YMCAs are working to prove that <strong style={{color:'var(--ace)'}}>A+R+B=T</strong>. HUDSON gives Cincinnati the computational infrastructure to prove it first — and prove it <em>irrefutably</em>.</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE: AIDA — THE CENTERPIECE
+   ═══════════════════════════════════════════════════════════════ */
+function AidaPage(){
+  const [showAll,setShowAll]=useState(false);
+  const [expEv,setExpEv]=useState(0);
+  const [tab,setTab]=useState(0);
+  const prob=PROBABILITY;
+  const below=prob<85;
+
+  return(
+    <div className="page">
+      <PageHeader badge="🔬 AIDA ENGINE — LIVE PIPELINE" badgeColor="var(--aida)" title="AI Dream Achievement Framework" sub="Full 7-component ARB pipeline applied to: Increase YMCA membership by 20% in 12 months. 50 fuzzy functions assessed. Every calculation transparent and auditable."/>
+      <Tabs tabs={['Goal & Antecedent','Fuzzy Functions (50)','Events & Paths (8)','Probability','Remediation Plan']} active={tab} onChange={setTab}/>
+
+      {tab===0&&(
+        <div>
+          <div className="card" style={{borderLeft:'3px solid var(--aida)',marginBottom:24}}>
+            <Badge text="STAGE 1 · GOAL DECLARATION" color="var(--aida)"/>
+            <h3 style={{marginTop:10,fontSize:'1.2rem'}}>Increase YMCA membership by 20% within 12 months</h3>
+            <div className="g g4" style={{marginTop:16}}>
+              <MetricCard label="Current Members" value={MEMBERS.length.toLocaleString()} small/>
+              <MetricCard label="Target" value={Math.round(MEMBERS.length*1.2).toLocaleString()} small color="var(--aida)"/>
+              <MetricCard label="Net New Required" value={`+${Math.round(MEMBERS.length*0.2).toLocaleString()}`} small color="var(--ace)"/>
+              <MetricCard label="Annual Revenue" value="$35M" small/>
+            </div>
+          </div>
+          <div className="card" style={{borderLeft:'3px solid var(--helm)'}}>
+            <Badge text="ANTECEDENT — INSTITUTIONAL HISTORY" color="var(--helm)"/>
+            <p style={{color:'var(--t2)',marginTop:10,lineHeight:1.7}}>The YMCA of Greater Cincinnati generates $35M annual revenue across 8 branches with ~18,000 members. 177-year mission: strengthen spirit, mind, and body for all. Theory of Change: A+R+B=T. Current reality: 35-42% first-year attrition, 1,000:1 member-to-staff ratio, 30% group participation, programming decisions driven by precedent rather than data. $8.75M+ annual attrition cost. The institution knows its mission but lacks the infrastructure to deliver it at scale.</p>
+          </div>
+        </div>
+      )}
+
+      {tab===1&&(
+        <div>
+          <Badge text="STAGE 2 · ORGANIZATIONAL FUZZY FUNCTIONS" color="var(--aida)"/>
+          <p style={{color:'var(--t2)',marginTop:8,marginBottom:16,fontSize:'.88rem'}}>Each function scored as fuzzy membership degree (μ) from 0.0–1.0. Top 10 selected by goal relevance for probability calculation.</p>
+          <h4 style={{color:'var(--aida)',marginBottom:10}}>Top 10 — Goal-Relevant</h4>
+          {TOP10.map(f=>(
+            <div key={f.id} className="card" style={{padding:'12px 18px',marginBottom:8,borderLeft:`3px solid ${f.mu<.4?'var(--rose)':f.mu<.65?'var(--fred)':'var(--ace)'}`}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:5}}>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  <span className="mono" style={{color:'var(--t3)',fontSize:'.68rem',width:20}}>#{f.rank}</span>
+                  <span style={{fontWeight:600,fontSize:'.82rem'}}>{f.name}</span>
+                  <Badge text={f.cat} color="var(--t3)"/>
+                </div>
+                <span className="mono" style={{fontWeight:700,color:f.mu<.4?'var(--rose)':f.mu<.65?'var(--fred)':'var(--ace)'}}>{f.mu.toFixed(2)}</span>
+              </div>
+              <Bar val={f.mu*100} color="auto"/>
+            </div>
+          ))}
+          <button className="exp-btn" style={{marginTop:12}} onClick={()=>setShowAll(!showAll)}>{showAll?'Hide':'Show'} all 50 functions</button>
+          {showAll&&(
+            <div style={{marginTop:12,display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))',gap:6}}>
+              {FUZZY_ALL.map(f=>(
+                <div key={f.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 10px',background:f.rank?'var(--aida15)':'var(--bg2)',borderRadius:6,border:`1px solid ${f.rank?'var(--aida)':'var(--bdr)'}`,fontSize:'.72rem'}}>
+                  <span style={{color:f.rank?'var(--t1)':'var(--t2)'}}>{f.id}. {f.name}</span>
+                  <span className="mono" style={{fontWeight:600,color:f.mu<.4?'var(--rose)':f.mu<.65?'var(--fred)':'var(--ace)'}}>{f.mu.toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab===2&&(
+        <div>
+          <Badge text="STAGE 3 · UPCOMING EVENTS — MULTIPLE PATHS" color="var(--aida)"/>
+          <p style={{color:'var(--t2)',marginTop:8,marginBottom:16,fontSize:'.88rem'}}>8 critical events in the 12-month horizon. Each has multiple weighted success and failure paths feeding the probability calculation.</p>
+          {EVENTS.map((ev,i)=>(
+            <div key={i} className="card" style={{marginBottom:12,cursor:'pointer',borderLeft:`3px solid ${i===expEv?'var(--aida)':'var(--bdr)'}`}} onClick={()=>setExpEv(i===expEv?-1:i)}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <div><h4 style={{fontSize:'.92rem'}}>{ev.name}</h4><span className="mono" style={{fontSize:'.68rem',color:'var(--t3)'}}>{ev.period}</span></div>
+                <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                  <span style={{fontSize:'.68rem',color:'var(--ace)'}}>✓{ev.sp.length}</span>
+                  <span style={{fontSize:'.68rem',color:'var(--rose)'}}>✗{ev.fp.length}</span>
+                  <span style={{color:'var(--t3)'}}>{i===expEv?'−':'+'}</span>
+                </div>
+              </div>
+              {i===expEv&&(
+                <div style={{marginTop:14}}>
+                  <div className="g g2">
+                    <div>
+                      <h4 style={{color:'var(--ace)',fontSize:'.72rem',textTransform:'uppercase',letterSpacing:'1px',marginBottom:8}}>Success Paths</h4>
+                      {ev.sp.map((p,j)=>(
+                        <div key={j} className="path-s" style={{background:'var(--bg2)',borderRadius:8,padding:12,marginBottom:8}}>
+                          <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
+                            <span style={{fontWeight:600,fontSize:'.78rem'}}>{p.l}</span>
+                            <span className="mono" style={{color:'var(--ace)',fontSize:'.75rem'}}>{(p.p*100).toFixed(0)}%</span>
+                          </div>
+                          <p style={{color:'var(--t2)',fontSize:'.75rem',lineHeight:1.5}}>{p.d}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div>
+                      <h4 style={{color:'var(--rose)',fontSize:'.72rem',textTransform:'uppercase',letterSpacing:'1px',marginBottom:8}}>Failure Paths</h4>
+                      {ev.fp.map((p,j)=>(
+                        <div key={j} className="path-f" style={{background:'var(--bg2)',borderRadius:8,padding:12,marginBottom:8}}>
+                          <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
+                            <span style={{fontWeight:600,fontSize:'.78rem'}}>{p.l}</span>
+                            <span className="mono" style={{color:'var(--rose)',fontSize:'.75rem'}}>{(p.p*100).toFixed(0)}%</span>
+                          </div>
+                          <p style={{color:'var(--t2)',fontSize:'.75rem',lineHeight:1.5}}>{p.d}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab===3&&(
+        <div>
+          <div className="card" style={{textAlign:'center',padding:'40px 28px',border:`2px solid ${below?'var(--rose)':'var(--ace)'}`,marginBottom:24}}>
+            <Badge text="STAGE 4 · CONSEQUENT — PROBABILITY" color="var(--aida)"/>
+            <div style={{marginTop:20}}>
+              <svg width="180" height="180" viewBox="0 0 180 180">
+                <circle cx="90" cy="90" r="80" fill="none" stroke="var(--bdr)" strokeWidth="7"/>
+                <circle cx="90" cy="90" r="80" fill="none" stroke={below?'var(--rose)':'var(--ace)'} strokeWidth="7"
+                  strokeDasharray={`${prob/100*502} 502`} transform="rotate(-90 90 90)" strokeLinecap="round"/>
+                <text x="90" y="84" textAnchor="middle" fill={below?'var(--rose)':'var(--ace)'} fontSize="38" fontWeight="700" className="mono">{prob}%</text>
+                <text x="90" y="106" textAnchor="middle" fill="var(--t3)" fontSize="10">GOAL PROBABILITY</text>
+              </svg>
+            </div>
+            <div style={{display:'flex',justifyContent:'center',gap:32,marginTop:16}}>
+              <div><div className="mono" style={{color:'var(--t3)',fontSize:'.72rem'}}>Threshold</div><div className="mono" style={{fontSize:'1.3rem',fontWeight:700,color:'var(--ace)'}}>85%</div></div>
+              <div><div className="mono" style={{color:'var(--t3)',fontSize:'.72rem'}}>Current</div><div className="mono" style={{fontSize:'1.3rem',fontWeight:700,color:below?'var(--rose)':'var(--ace)'}}>{prob}%</div></div>
+              <div><div className="mono" style={{color:'var(--t3)',fontSize:'.72rem'}}>Gap</div><div className="mono" style={{fontSize:'1.3rem',fontWeight:700,color:'var(--rose)'}}>{below?`-${85-prob}%`:'✓ MET'}</div></div>
+            </div>
+          </div>
+          {below&&(
+            <div className="card" style={{borderLeft:'3px solid var(--rose)'}}>
+              <Badge text="⚠ BELOW THRESHOLD — DIAGNOSTIC" color="var(--rose)" bg="var(--rose15)"/>
+              <h3 style={{marginTop:10,marginBottom:14}}>What's Holding the YMCA Below 85%</h3>
+              <p style={{color:'var(--t2)',marginBottom:16,fontSize:'.85rem'}}>These capabilities scored below μ=0.45 — weak institutional capacity critical to 20% growth:</p>
+              {WEAK.map(f=>(
+                <div key={f.id} style={{padding:'10px 0',borderBottom:'1px solid var(--bdr)'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:5}}>
+                    <span style={{fontWeight:600,fontSize:'.85rem'}}>{f.name}</span>
+                    <span className="mono" style={{color:'var(--rose)',fontWeight:700}}>{f.mu.toFixed(2)}</span>
+                  </div>
+                  <Bar val={f.mu*100} color="var(--rose)"/>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab===4&&(
+        <div>
+          <Badge text="IDENTITY SHIFT — STRUCTURED REMEDIATION" color="var(--ace)"/>
+          <p style={{color:'var(--t2)',marginTop:8,marginBottom:20,fontSize:'.88rem'}}>For each weak capability, AIDA prescribes actions at four cadences: daily habits, weekly reviews, monthly strategy, annual commitment.</p>
+          {WEAK.map(f=>{
+            const plan=REM_PLANS[f.name]||{daily:['Monitor daily KPIs','Execute one micro-improvement','Document in FRED'],weekly:['Weekly function review','Team alignment','FRED scorecard'],monthly:['Deep-dive analysis','Strategic adjustment','Present to leadership'],annual:['Annual strategic review','Target reset','Collaborative benchmarking']};
+            return(
+              <div key={f.id} className="card" style={{marginBottom:16,borderLeft:'3px solid var(--aida)'}}>
+                <h4 style={{color:'var(--aida)'}}>Remediate: {f.name} <span className="mono" style={{color:'var(--rose)',fontSize:'.78rem'}}>(μ={f.mu.toFixed(2)})</span></h4>
+                <div className="rem-g" style={{marginTop:12}}>
+                  {[{c:'Daily',icon:'☀️',col:'var(--ace)',items:plan.daily},{c:'Weekly',icon:'📅',col:'var(--aida)',items:plan.weekly},{c:'Monthly',icon:'📊',col:'var(--fred)',items:plan.monthly},{c:'Annually',icon:'🎯',col:'var(--helm)',items:plan.annual}].map((r,j)=>(
+                    <div key={j} style={{background:'var(--bg2)',borderRadius:10,padding:14,border:'1px solid var(--bdr)'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:5,marginBottom:8}}><span>{r.icon}</span><span style={{fontWeight:700,fontSize:'.75rem',color:r.col,textTransform:'uppercase',letterSpacing:'.5px'}}>{r.c}</span></div>
+                      {r.items.map((a,k)=>(
+                        <div key={k} style={{display:'flex',gap:6,marginBottom:5,alignItems:'flex-start'}}>
+                          <span style={{color:'var(--t3)',fontSize:'.68rem',marginTop:2}}>→</span>
+                          <span style={{color:'var(--t2)',fontSize:'.75rem',lineHeight:1.5}}>{a}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+          <div className="card" style={{textAlign:'center',padding:'36px 28px',border:'2px solid var(--aida)',marginTop:24}}>
+            <div style={{width:48,height:48,borderRadius:'50%',background:'linear-gradient(135deg,var(--helm),var(--aida))',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px',fontSize:'1.2rem',fontWeight:700,color:'white'}}>O</div>
+            <h3>Ready to Close the Gap?</h3>
+            <p style={{color:'var(--t2)',maxWidth:550,margin:'10px auto 0',fontSize:'.9rem',lineHeight:1.7}}>AIDA has diagnosed the weak points and built your plan. 95% of people are more likely to reach their goals with an accountability partner. HUDSON is yours.</p>
+            <div style={{marginTop:22,display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
+              <button className="btn btn-primary" onClick={()=>alert('In full HUDSON deployment, Olivia begins weekly leadership check-ins — tracking remediation progress, recalculating probability monthly, escalating to FRED if any function trends down.\n\nThis is a proof-of-concept.\n\nContact: haidar@xtainable.com')}>Yes — Have Olivia Follow Up</button>
+              <button className="btn btn-ghost" onClick={()=>alert('AIDA respects your decision. Your plan remains available.\n\nContact: haidar@xtainable.com')}>Not Yet — I Need More Time</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE: FRED
+   ═══════════════════════════════════════════════════════════════ */
+function FredPage(){
+  const [tab,setTab]=useState(0);
+  const cohorts=[{c:'0-3 mo',n:620,r:68.2,v:3.2,nps:32},{c:'3-6 mo',n:480,r:74.5,v:4.8,nps:41},{c:'6-12 mo',n:710,r:81.3,v:5.6,nps:52},{c:'1-2 yr',n:890,r:88.7,v:6.9,nps:64},{c:'2-5 yr',n:560,r:93.1,v:7.4,nps:71},{c:'5+ yr',n:340,r:96.4,v:8.1,nps:78}];
+
+  return(
+    <div className="page">
+      <PageHeader badge="📡 FRED ENGINE" badgeColor="var(--fred)" title="Forecasting & Real-Time Enterprise Intelligence" sub="Predictive analytics. Churn forecasting. Mission attribution. Strategic scenario modeling."/>
+      <Tabs tabs={['Retention Cohorts','Mission Attribution','Alerts','Staff Analytics']} active={tab} onChange={setTab}/>
+
+      {tab===0&&(
+        <div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:8,marginBottom:24}}>
+            {cohorts.map((c,i)=>(
+              <div key={i} className="card" style={{textAlign:'center',padding:'14px 8px'}}>
+                <div className="mono" style={{fontSize:'.68rem',color:'var(--t3)',marginBottom:6}}>{c.c}</div>
+                <div style={{height:100,display:'flex',alignItems:'flex-end',justifyContent:'center',marginBottom:6}}>
+                  <div style={{width:'55%',height:`${c.r}%`,background:`linear-gradient(to top,var(--fred),rgba(245,158,11,.35))`,borderRadius:'5px 5px 0 0'}}/>
+                </div>
+                <div className="mono" style={{fontWeight:700,color:'var(--fred)',fontSize:'.88rem'}}>{c.r}%</div>
+                <div style={{fontSize:'.6rem',color:'var(--t3)',marginTop:2}}>NPS {c.nps} · {c.v}/mo</div>
+                <div style={{fontSize:'.6rem',color:'var(--t4)'}}>{c.n} members</div>
+              </div>
+            ))}
+          </div>
+          <DataTable columns={[
+            {key:'c',label:'Cohort'},{key:'n',label:'Members'},{key:'r',label:'Retention %',render:v=><span className="mono" style={{color:'var(--fred)'}}>{v}%</span>},{key:'v',label:'Visits/Mo'},{key:'nps',label:'NPS'}
+          ]} data={cohorts}/>
+        </div>
+      )}
+
+      {tab===1&&(
+        <div>
+          <div className="g g3" style={{marginBottom:24}}>
+            <MetricCard label="Causal Chains Traced" value="2,847" sub="last 90 days" color="var(--fred)"/>
+            <MetricCard label="Olivia Return Rate" value="73%" sub="within 48h contact window" color="var(--fred)"/>
+            <MetricCard label="AIDA Retention Lift" value="89.1%" sub="vs 71.3% without goal plan" color="var(--fred)"/>
+          </div>
+          <div className="card" style={{borderLeft:'3px solid var(--fred)'}}>
+            <h3 style={{marginBottom:14}}>Attribution Flow: Intervention → Outcome</h3>
+            {[{from:'Olivia Check-in',mid:'Visit Frequency ↑',to:'Retention Secured',pct:73},
+              {from:'ACE Group Placement',mid:'Social Connectivity ↑',to:'Belonging Confirmed',pct:89},
+              {from:'AIDA Goal Plan',mid:'Goal Milestone Hit',to:'Achievement Score ↑',pct:62},
+              {from:'Staff Outreach',mid:'Program Enrollment',to:'NPS Improved',pct:58},
+              {from:'FRED Alert → HELM',mid:'Churn Risk Mitigated',to:'Revenue Retained',pct:71},
+            ].map((f,i)=>(
+              <div key={i} style={{display:'flex',alignItems:'center',gap:4,marginBottom:8}}>
+                <div style={{flex:1,background:'var(--bg2)',padding:'8px 12px',borderRadius:8,fontSize:'.78rem',fontWeight:600,borderLeft:'3px solid var(--aida)'}}>{f.from}</div>
+                <span style={{color:'var(--t3)'}}>→</span>
+                <div style={{flex:1,background:'var(--bg2)',padding:'8px 12px',borderRadius:8,fontSize:'.78rem',color:'var(--t2)'}}>{f.mid}</div>
+                <span style={{color:'var(--t3)'}}>→</span>
+                <div style={{flex:1,background:'var(--bg2)',padding:'8px 12px',borderRadius:8,fontSize:'.78rem',borderRight:'3px solid var(--ace)'}}>{f.to}</div>
+                <span className="mono" style={{width:50,textAlign:'right',fontWeight:700,color:'var(--fred)',fontSize:'.82rem'}}>{f.pct}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {tab===2&&(
+        <div>
+          {ALERTS.map((a,i)=>(
+            <div key={i} className="alert-card" style={{borderLeftColor:a.color}}>
+              <div><span style={{color:a.color,fontWeight:700,fontSize:'.75rem'}}>{a.icon} {a.sev}</span><span style={{color:'var(--t3)',marginLeft:10,fontSize:'.75rem'}}>{a.branch}</span></div>
+              <div style={{color:'var(--t1)',fontSize:'.85rem',margin:'6px 0 4px'}}>{a.desc}</div>
+              <div style={{color:'var(--t3)',fontSize:'.72rem',fontStyle:'italic'}}>↳ {a.resp}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab===3&&(
+        <div>
+          <div className="g g4" style={{marginBottom:20}}>
+            <MetricCard label="Total Staff" value={STAFF.length} color="var(--fred)"/>
+            <MetricCard label="Avg Satisfaction" value={Math.round(STAFF.reduce((s,x)=>s+x.satisfaction,0)/STAFF.length*10)/10} color="var(--ace)"/>
+            <MetricCard label="At-Risk Staff" value={STAFF.filter(s=>s.turnoverRisk>.6).length} color="var(--rose)"/>
+            <MetricCard label="Avg Impact Score" value={Math.round(STAFF.reduce((s,x)=>s+x.impactScore,0)/STAFF.length*10)/10} color="var(--aida)"/>
+          </div>
+          <DataTable maxH={450} columns={[
+            {key:'id',label:'ID'},
+            {key:'name',label:'Name',style:()=>({color:'var(--t1)',fontWeight:500})},
+            {key:'role',label:'Role'},
+            {key:'department',label:'Dept'},
+            {key:'branch',label:'Branch'},
+            {key:'satisfaction',label:'Satisfaction',render:v=><span className="mono" style={{color:v<50?'var(--rose)':v<70?'var(--fred)':'var(--ace)'}}>{v}</span>},
+            {key:'impactScore',label:'Impact',render:v=><span className="mono">{v}</span>},
+            {key:'turnoverRisk',label:'Turnover Risk',render:v=><span className="mono" style={{color:v>.6?'var(--rose)':v>.35?'var(--fred)':'var(--ace)'}}>{(v*100).toFixed(1)}%</span>},
+            {key:'membersServed',label:'Members Served'},
+            {key:'tenure',label:'Tenure (mo)'},
+          ]} data={STAFF}/>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE: FINANCIAL
+   ═══════════════════════════════════════════════════════════════ */
+function FinancialPage(){
+  const [ret,setRet]=useState(5);
+  const [rev,setRev]=useState(35);
+  const [cost,setCost]=useState(85);
+  const retVal=Math.round(rev*ret/100*1e6);
+  const acqVal=Math.round(rev*.03*1e6*.7);
+  const staffVal=175000;
+  const total=retVal+acqVal+staffVal;
+  const roi=Math.round(total/(cost*1000));
+
+  return(
+    <div className="page">
+      <PageHeader badge="FINANCIAL IMPACT CENTER" badgeColor="var(--ace)" title="The Revenue Opportunity" sub="Three independent revenue vectors — each independently justifiable. Conservative scenario alone generates 15× ROI."/>
+
+      <div className="g g3" style={{marginBottom:24}}>
+        {[{t:'Member Retention',i:'🛡️',c:'var(--ace)',d:'Stop existing revenue from leaving',v:['$1,250,000','$2,000,000','$3,000,000']},
+          {t:'New Acquisition',i:'🚀',c:'var(--aida)',d:'Community visibility at zero cost',v:['$250,000','$750,000','$1,250,000']},
+          {t:'Staff Savings',i:'👥',c:'var(--fred)',d:'Reduce annual turnover cost',v:['$100,000','$175,000','$300,000']},
+        ].map((v,i)=>(
+          <div key={i} className="card" style={{borderTop:`3px solid ${v.c}`}}>
+            <span style={{fontSize:'1.3rem'}}>{v.i}</span>
+            <h4 style={{marginTop:6}}>{v.t}</h4>
+            <p style={{color:'var(--t2)',fontSize:'.78rem',marginTop:3,marginBottom:14}}>{v.d}</p>
+            {['Conservative','Moderate','Aggressive'].map((s,j)=>(
+              <div key={j} style={{display:'flex',justifyContent:'space-between',padding:'5px 0',borderBottom:'1px solid var(--bdr)'}}>
+                <span style={{fontSize:'.78rem',color:'var(--t2)'}}>{s}</span>
+                <span className="mono" style={{fontWeight:600,fontSize:'.78rem'}}>{v.v[j]}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <div className="card" style={{border:'2px solid var(--ace)',padding:28,marginBottom:24}}>
+        <div className="g g3" style={{textAlign:'center',marginBottom:20}}>
+          <div><div className="mv" style={{color:'var(--ace)'}}>$1.6M</div><div className="ml">Conservative</div></div>
+          <div><div className="mv" style={{color:'var(--aida)'}}>$2.9M</div><div className="ml">Moderate</div></div>
+          <div><div className="mv" style={{color:'var(--helm)'}}>$4.55M</div><div className="ml">Aggressive</div></div>
+        </div>
+        <div style={{background:'rgba(16,185,129,.08)',border:'1px solid var(--ace)',borderRadius:10,padding:'16px 20px',textAlign:'center'}}>
+          <p style={{fontSize:'.82rem',color:'var(--t2)'}}>Infrastructure Cost: <strong className="mono" style={{color:'var(--t1)'}}>$55,000 – $100,000/year</strong></p>
+          <p className="mono" style={{fontSize:'1.2rem',fontWeight:700,color:'var(--ace)',marginTop:6}}>Conservative ROI: 15× floor</p>
+        </div>
+      </div>
+
+      <div className="card" style={{marginBottom:24}}>
+        <h3 style={{marginBottom:16}}>Interactive ROI Calculator</h3>
+        <div className="g g3" style={{marginBottom:20}}>
+          <div>
+            <label style={{fontSize:'.72rem',color:'var(--t3)',textTransform:'uppercase',letterSpacing:'.5px'}}>Annual Revenue ($M)</label>
+            <input type="range" className="slider" min={10} max={100} value={rev} onChange={e=>setRev(+e.target.value)}/>
+            <span className="mono" style={{color:'var(--aida)'}}>${rev}M</span>
+          </div>
+          <div>
+            <label style={{fontSize:'.72rem',color:'var(--t3)',textTransform:'uppercase',letterSpacing:'.5px'}}>Retention Improvement (pts)</label>
+            <input type="range" className="slider" min={1} max={15} value={ret} onChange={e=>setRet(+e.target.value)}/>
+            <span className="mono" style={{color:'var(--aida)'}}>{ret} points</span>
+          </div>
+          <div>
+            <label style={{fontSize:'.72rem',color:'var(--t3)',textTransform:'uppercase',letterSpacing:'.5px'}}>Infrastructure Cost ($K/yr)</label>
+            <input type="range" className="slider" min={55} max={150} value={cost} onChange={e=>setCost(+e.target.value)}/>
+            <span className="mono" style={{color:'var(--aida)'}}>${cost}K</span>
+          </div>
+        </div>
+        <div className="g g4">
+          <MetricCard label="Retention Revenue" value={`$${(retVal/1e6).toFixed(1)}M`} color="var(--ace)"/>
+          <MetricCard label="Acquisition Value" value={`$${(acqVal/1e3).toFixed(0)}K`} color="var(--aida)"/>
+          <MetricCard label="Total Impact" value={`$${(total/1e6).toFixed(1)}M`} color="var(--fred)"/>
+          <MetricCard label="ROI Multiple" value={`${roi}×`} color="var(--helm)"/>
+        </div>
+      </div>
+
+      <h3 style={{marginBottom:12}}>Product Suite</h3>
+      <DataTable columns={[
+        {key:'product',label:'Product',style:()=>({color:'var(--t1)',fontWeight:600})},
+        {key:'engines',label:'Engines'},
+        {key:'onboard',label:'Onboarding'},
+        {key:'host',label:'Hosting'},
+      ]} data={[
+        {product:'HUDSON MINI',engines:'HELM + ACE',onboard:'50%',host:'50%'},
+        {product:'HUDSON DREAM',engines:'HELM + ACE + AIDA',onboard:'75%',host:'75%'},
+        {product:'HUDSON DASH',engines:'HELM + ACE + FRED',onboard:'75%',host:'75%'},
+        {product:'HUDSON (Full)',engines:'HELM + ACE + AIDA + FRED',onboard:'100%',host:'100%'},
+      ]}/>
+      <div className="card" style={{marginTop:16,textAlign:'center'}}>
+        <p style={{color:'var(--t2)',fontSize:'.85rem'}}>YMCAs investing during development receive <strong style={{color:'var(--ace)'}}>dollar-for-dollar credit</strong> against future onboarding. $5,000/month × 10 months = $50,000 reduction.</p>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR + APP SHELL
+   ═══════════════════════════════════════════════════════════════ */
+const PAGES=[
+  {id:'dash',icon:'📊',label:'Dashboard',group:'Overview'},
+  {id:'helm',icon:'🧭',label:'HELM',group:'Engines'},
+  {id:'ace',icon:'⚡',label:'ACE',group:'Engines'},
+  {id:'aida',icon:'🔬',label:'AIDA',group:'Engines'},
+  {id:'fred',icon:'📡',label:'FRED',group:'Engines'},
+  {id:'financial',icon:'💰',label:'Financial',group:'Intelligence'},
+];
+
+function App(){
+  const [page,setPage]=useState('dash');
+  let groups={};
+  PAGES.forEach(p=>{if(!groups[p.group])groups[p.group]=[];groups[p.group].push(p);});
+
+  return(
+    <>
+      <div className="sidebar">
+        <div className="logo-area" style={{display:'flex',alignItems:'center'}}>
+          <span className="logo-icon">🏛️</span>
+          <div className="logo-text">
+            <div className="title">HUDSON</div>
+            <div className="sub">YMCA Intelligence</div>
+          </div>
+        </div>
+        <div className="nav-section">
+          {Object.entries(groups).map(([g,items])=>(
+            <div key={g}>
+              <div className="nav-group-label nav-text">{g}</div>
+              {items.map(p=>(
+                <div key={p.id} className={`nav-item${page===p.id?' active':''}`} onClick={()=>setPage(p.id)}>
+                  <span className="nav-icon">{p.icon}</span>
+                  <span className="nav-text">{p.label}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="sidebar-footer">Xtainable LLC · Protocol v5.0<br/>{MEMBERS.length+STAFF.length} records loaded</div>
+      </div>
+      <div className="main">
+        {page==='dash'&&<DashboardPage/>}
+        {page==='helm'&&<HelmPage/>}
+        {page==='ace'&&<AcePage/>}
+        {page==='aida'&&<AidaPage/>}
+        {page==='fred'&&<FredPage/>}
+        {page==='financial'&&<FinancialPage/>}
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
